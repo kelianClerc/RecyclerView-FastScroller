@@ -23,12 +23,6 @@ import android.content.Context
 import android.content.res.TypedArray
 import android.graphics.Rect
 import android.graphics.drawable.Drawable
-import androidx.annotation.*
-import androidx.core.content.ContextCompat
-import androidx.core.widget.TextViewCompat
-import androidx.appcompat.widget.AppCompatImageView
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import android.util.AttributeSet
 import android.util.Log
 import android.view.Gravity
@@ -39,6 +33,15 @@ import android.view.ViewPropertyAnimator
 import android.widget.LinearLayout
 import android.widget.RelativeLayout
 import android.widget.TextView
+import androidx.annotation.DimenRes
+import androidx.annotation.Keep
+import androidx.annotation.StyleRes
+import androidx.annotation.StyleableRes
+import androidx.appcompat.widget.AppCompatImageView
+import androidx.core.content.ContextCompat
+import androidx.core.widget.TextViewCompat
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
@@ -474,7 +477,7 @@ class RecyclerViewFastScroller @JvmOverloads constructor(
     private fun RecyclerView.computePositionForOffsetAndScroll(relativeRawPos : Float) : Int {
         val layoutManager : RecyclerView.LayoutManager? = this.layoutManager
         val recyclerViewItemCount = this.adapter?.itemCount ?: 0
-        val newOffset = relativeRawPos / ((this.computeVerticalScrollExtent().toFloat()) - handleImageView.height.toFloat())
+        val newOffset = relativeRawPos / ((this.computeVerticalScrollExtent().toFloat()) + handleImageView.height.toFloat())
         when(layoutManager){
             is LinearLayoutManager -> {
                 val totalVisibleItems = layoutManager.getTotalCompletelyVisibleItemCount()
@@ -544,6 +547,26 @@ class RecyclerViewFastScroller @JvmOverloads constructor(
 
             override fun onItemRangeRemoved(positionStart: Int, itemCount: Int) {
                 super.onItemRangeRemoved(positionStart, itemCount)
+                previousTotalVisibleItem = 0
+            }
+
+            override fun onItemRangeMoved(fromPosition: Int, toPosition: Int, itemCount: Int) {
+                super.onItemRangeMoved(fromPosition, toPosition, itemCount)
+                previousTotalVisibleItem = 0
+            }
+
+            override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
+                super.onItemRangeInserted(positionStart, itemCount)
+                previousTotalVisibleItem = 0
+            }
+
+            override fun onItemRangeChanged(positionStart: Int, itemCount: Int) {
+                super.onItemRangeChanged(positionStart, itemCount)
+                previousTotalVisibleItem = 0
+            }
+
+            override fun onItemRangeChanged(positionStart: Int, itemCount: Int, payload: Any?) {
+                super.onItemRangeChanged(positionStart, itemCount, payload)
                 previousTotalVisibleItem = 0
             }
         }
